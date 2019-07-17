@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="springBoot.mapper.UserMapper">
+	<resultMap id="BaseResultMap" type="springBoot.po.User">
+		<result column="id" jdbcType="INTEGER" property="id" />
+		<result column="username" jdbcType="VARCHAR"
+			property="username" />
+		<result column="birthday" jdbcType="DATE" property="birthday" />
+		<result column="sex" jdbcType="CHAR" property="sex" />
+		<result column="address" jdbcType="VARCHAR" property="address" />
+	</resultMap>
+	<resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="springBoot.po.UserWithBLOBs">
+    <result column="ssl_cipher" jdbcType="LONGVARBINARY" property="sslCipher" />
+    <result column="x509_issuer" jdbcType="LONGVARBINARY" property="x509Issuer" />
+    <result column="x509_subject" jdbcType="LONGVARBINARY" property="x509Subject" />
+    <result column="authentication_string" jdbcType="LONGVARCHAR" property="authenticationString" />
+  </resultMap>
+	<sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Blob_Column_List">
+    ssl_cipher, x509_issuer, x509_subject, authentication_string
+  </sql>
+	<sql id="Update_By_Example_Where_Clause">
+		<where>
+			<foreach collection="example.oredCriteria" item="criteria"
+				separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" suffix=")" prefixOverrides="and">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">
+									and ${criterion.condition}
+								</when>
+								<when test="criterion.singleValue">
+									and ${criterion.condition} #{criterion.value}
+								</when>
+								<when test="criterion.betweenValue">
+									and ${criterion.condition} #{criterion.value}
+									and
+									#{criterion.secondValue}
+								</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach collection="criterion.value" item="listItem"
+										open="(" close=")" separator=",">
+										#{listItem}
+									</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Base_Column_List">
+		id, username, birthday, sex, address
+	</sql>
+	<!-- 分页查询 -->
+	<select id="selectUserByPage" parameterType="java.util.Map"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from user
+		limit
+		#{startRow,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+	</select>
+	<!-- 分页查询 -->
+	<select id="selectUserByPage2" parameterType="java.util.Map"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from user
+		where username=#{nickname,jdbcType=VARCHAR}
+		limit
+		#{startRow,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+	</select>
+	<!-- 分页查询总数 -->
+	<select id="selectUserByTotal" resultType="java.lang.Integer">
+		select
+		count(*)
+		from
+		user
+	</select>
+	<select id="selectUserByTotal2" resultType="java.lang.Integer" parameterType="java.lang.String">
+		select
+		count(*)
+		from
+		user where username=#{usename,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey"
+		parameterType="java.lang.Integer">
+		delete from user
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from user
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+	<insert id="insertSelective" parameterType="springBoot.po.User">
+		insert into user
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="username != null">
+				username,
+			</if>
+			<if test="birthday != null">
+				birthday,
+			</if>
+			<if test="sex != null">
+				sex,
+			</if>
+			<if test="address != null">
+				address,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="username != null">
+				#{username,jdbcType=VARCHAR},
+			</if>
+			<if test="birthday != null">
+				#{birthday,jdbcType=DATE},
+			</if>
+			<if test="sex != null">
+				#{sex,jdbcType=CHAR},
+			</if>
+			<if test="address != null">
+				#{address,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<insert id="insert" parameterType="springBoot.po.User">
+		insert into user (id,
+		username, birthday,
+		sex, address)
+		values (#{id,jdbcType=INTEGER},
+		#{username,jdbcType=VARCHAR},
+		#{birthday,jdbcType=DATE},
+		#{sex,jdbcType=CHAR}, #{address,jdbcType=VARCHAR})
+	</insert>
+	<update id="updateByExampleSelective" parameterType="map">
+		update user
+		<set>
+			<if test="record.id != null">
+				id = #{record.id,jdbcType=INTEGER},
+			</if>
+			<if test="record.username != null">
+				username = #{record.username,jdbcType=VARCHAR},
+			</if>
+			<if test="record.birthday != null">
+				birthday = #{record.birthday,jdbcType=DATE},
+			</if>
+			<if test="record.sex != null">
+				sex = #{record.sex,jdbcType=CHAR},
+			</if>
+			<if test="record.address != null">
+				address = #{record.address,jdbcType=VARCHAR},
+			</if>
+		</set>
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByPrimaryKeySelective"
+		parameterType="springBoot.mapper.UserMapper">
+		update user
+		<set>
+			<if test="username != null">
+				username = #{username,jdbcType=VARCHAR},
+			</if>
+			<if test="birthday != null">
+				birthday = #{birthday,jdbcType=DATE},
+			</if>
+			<if test="sex != null">
+				sex = #{sex,jdbcType=CHAR},
+			</if>
+			<if test="address != null">
+				address = #{address,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<!-- ************************************************************* -->
+	<select id="countByExample"
+		parameterType="springBoot.po.UserExample"
+		resultType="java.lang.Integer">
+		select count(*) from user
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</select>
+	<delete id="deleteByExample"
+		parameterType="springBoot.po.UserExample">
+		delete from user
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</delete>
+	<select id="selectByExample"
+		parameterType="springBoot.po.UserExample" resultMap="BaseResultMap">
+		select
+		<if test="distinct">
+			distinct
+		</if>
+		<include refid="Base_Column_List" />
+		from user
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+		<if test="orderByClause != null">
+			order by ${orderByClause}
+		</if>
+	</select>
+	<select id="selectByExampleWithBLOBs"
+		parameterType="springBoot.po.UserExample"
+		resultMap="ResultMapWithBLOBs">
+		select
+		<if test="distinct">
+			distinct
+		</if>
+		<include refid="Base_Column_List" />
+		,
+		<include refid="Blob_Column_List" />
+		from user
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+		<if test="orderByClause != null">
+			order by ${orderByClause}
+		</if>
+	</select>
+	
+	<!--  条件查询  -->
+    <!-- <select id = "findOrdersByCon" parameterType="java.util.Map"
+		resultMap="BaseResultMap">
+		SELECT * FROM `user` where 1=1
+        <if test="username != null">
+        	and username = #{username}
+			and	username = #{record.username,jdbcType=VARCHAR}
+		</if>
+	</select> -->
+
+
+
+</mapper>
